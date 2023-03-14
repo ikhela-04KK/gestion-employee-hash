@@ -1,61 +1,63 @@
 import sqlite3
-from employé import Employee
+from Emply import Employee
+ #creation d'ue base de donnée pour les tresoin
+ # 2- Resumé sur les base de donnée , l'algèbre relationnelle 
+ # """
 
-conn = sqlite3.connect('ikhela.db')
+class EmploiDB:
+  def __init__(self,db_name):
+    self._conn = sqlite3.connect(db_name)
+    self._cursor = self._conn.cursor()
+    
+    self._cursor.execute("""CREATE TABLE IF NOT EXISTS emails (
+    email VARCHAR(255)
+    )"""
+              )
 
-c=conn.cursor()
+  def insert_mail(self,email):
+    with self._conn:
+      self._cursor.execute("INSERT INTO emails VALUES (:email)",{'email':email})
 
-# c.execute("""CREATE TABLE employees ( 
-#         premier text,
-#         dernier text,
-#         pay integer
-#         )""")
+  #afficher les emails disponible dans la base de donnée
+  def get_email_emp(self):
+    self._cursor.execute("SELECT * FROM emails")
+    return self._cursor.fetchall()
 
-def insert_emp(emp):
-    with conn:
-        c.execute("INSERT INTO employees VALUES (:premier, :dernier, :pay)", {'premier': emp.first,'dernier': emp.last, 'pay': emp.pay})
-        
-def get_emps_by_name():
-    c.execute("SELECT * FROM employees")# pour afficher toutes tables confondu, et aussi dernier=:dernier",{'dernier':lastname}
-    return c.fetchall()
+  #mise en place de l'algorithme de hachage pour une recherche rapide
+  
+  def close(self):
+      self._conn.close()
 
-def update_pay(emp,pay): 
-    with conn:  # esssayons de de remplacer les valeurs de SET par d'autre pouvoir si ça vas être modifié
-        c.execute("""UPDATE employees SET pay=:pay
-                    WHERE premier= :premier AND dernier=:dernier
-                """,
-                    {'premier':emp.first, 'dernier':emp.last, 'pay':emp.pay}
-                )
+    
 
-def remove_emp(emp):
-    with conn:
-        c.execute("""DELETE FROM employees WHERE premier = :premier AND dernier = :dernier""",
-                {'premier':emp.first, 'dernier':emp.last, 'pay':emp.pay}
-                )
-        
-emp_1=Employee('John','Doe',80000)# nous avons créer une classe qui permet d'ajouter des elements à notre base de données
-emp_2=Employee('Jane','Doe',90000)
-emp_3=Employee('marc','chiu',45000)
-emp_4=Employee('marc','Doe',80000)
-# insert_emp(emp_1)
+
+#enregistrement d'un mail dans la base de donnée
+emp_db = EmploiDB('emails.db')
+print(emp_db.get_email_emp())
+
+emp1 = Employee("koffi","kan",15,"ida",50000)
+emp2 = Employee("kouadio","Eunice",25,"ida2",150000)
+emp1_email = emp1.create_email_emp()
+emp2_email = emp2.create_email_emp()
+emp_db.insert_mail(emp1_email)
+emp_db.insert_mail(emp2_email)
+
+emp_db.close()
+
+
 # print()
-# insert_emp(emp_2)
-# print()
-# insert_emp(emp_3)
-# print()
-# insert_emp(emp_4)
-emps=get_emps_by_name() 
-# print(emps)
-# 
-
-# update_pay(emp_1, 18500)
-# remove_emp(emp_2)
-update_pay(emp_1, 195000)# permet de modifier son solde uniquement 
-print(emps)
-# emps=get_emps_by_name("Doe") 
-# print(emps)
+# print(emp2.fullname())
 
 
 
-conn.commit()
-conn.close()
+
+
+
+
+
+
+
+
+
+
+
